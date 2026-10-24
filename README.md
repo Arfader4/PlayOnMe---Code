@@ -20,7 +20,7 @@ Format paczek zadań: [docs/pack-format.md](docs/pack-format.md) (wspólny ze St
 - Poziom gracza: progi 0, 100, 300, 600, 1000… XP (każdy kolejny skok o 100 większy).
 - Poziom paczki odblokowuje się, gdy w poprzednim zaliczysz co najmniej 60% kart.
 - Kod: `domain/Scoring.kt` (czyste funkcje z testami), zapis w `data/ProgressRepository.kt`.
-4. **Ekrany naprawdę:** wybór języka → lista poziomów (z postępem) → runda z kodem i opcjami + wyjaśnienie → podsumowanie XP.
+4. **Ekrany** ✅ wybór języka → lista poziomów (z postępem) → runda z kodem i opcjami + wyjaśnienie → podsumowanie XP.
 5. **Szlif:** kolorowanie składni, animacje odpowiedzi, ikona, build APK.
 
 Później: „znajdź błąd”, T-SQL, serie, odznaki, bossowie, rundy na czas, synchronizacja ze StudyOnMe.
