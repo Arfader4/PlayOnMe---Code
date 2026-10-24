@@ -19,13 +19,25 @@ class PackParserTest {
             val pack = PackParser.parse(file.readText())
             assertEquals("id paczki musi pasować do nazwy pliku", file.nameWithoutExtension, pack.id)
             assertEquals("zduplikowane id kart w ${pack.id}", pack.cards.size, pack.cards.map { it.id }.toSet().size)
+            val levels = pack.levels.map { it.number }.toSet()
             for (card in pack.cards) {
+                if (levels.isNotEmpty()) {
+                    assertTrue("${card.id}: poziom ${card.level} nie jest opisany w levels", card.level in levels)
+                }
                 val answer = card.answer
                 if (answer is Answer.Choice) {
                     assertTrue("${card.id}: correct poza zakresem", answer.correct in answer.options.indices)
                 }
             }
         }
+    }
+
+    @Test
+    fun csharpBasicsHasFullMvpContent() {
+        val pack = PackParser.parse(File(packsDir, "csharp-basics.json").readText())
+        assertEquals(20, pack.cards.size)
+        assertTrue(pack.cards.all { it.type == CardType.PREDICT_OUTPUT })
+        assertEquals(setOf(1, 2, 3, 4), pack.cards.map { it.level }.toSet())
     }
 
     @Test
