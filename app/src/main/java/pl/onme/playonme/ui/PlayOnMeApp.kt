@@ -7,17 +7,15 @@ import androidx.navigation.compose.rememberNavController
 import pl.onme.playonme.ui.screens.LanguageScreen
 import pl.onme.playonme.ui.screens.LevelsScreen
 import pl.onme.playonme.ui.screens.RoundScreen
-import pl.onme.playonme.ui.screens.SummaryScreen
 
 object Routes {
     const val LANGUAGES = "languages"
     const val LEVELS = "levels/{subject}"
+    // Podsumowanie jest częścią rundy (ten sam ViewModel trzyma wynik), więc nie ma osobnej trasy.
     const val ROUND = "round/{packId}/{level}"
-    const val SUMMARY = "summary/{xp}/{correct}/{total}"
 
     fun levels(subject: String) = "levels/$subject"
     fun round(packId: String, level: Int) = "round/$packId/$level"
-    fun summary(xp: Int, correct: Int, total: Int) = "summary/$xp/$correct/$total"
 }
 
 @Composable
@@ -38,24 +36,7 @@ fun PlayOnMeApp() {
         composable(Routes.ROUND) { entry ->
             val packId = entry.arguments?.getString("packId").orEmpty()
             val level = entry.arguments?.getString("level")?.toIntOrNull() ?: 1
-            RoundScreen(
-                packId = packId,
-                level = level,
-                onFinished = { xp, correct, total ->
-                    nav.navigate(Routes.summary(xp, correct, total)) {
-                        popUpTo(Routes.LEVELS)
-                    }
-                },
-            )
-        }
-        composable(Routes.SUMMARY) { entry ->
-            val args = entry.arguments
-            SummaryScreen(
-                xp = args?.getString("xp")?.toIntOrNull() ?: 0,
-                correct = args?.getString("correct")?.toIntOrNull() ?: 0,
-                total = args?.getString("total")?.toIntOrNull() ?: 0,
-                onDone = { nav.popBackStack() },
-            )
+            RoundScreen(packId = packId, level = level, onExit = { nav.popBackStack() })
         }
     }
 }
