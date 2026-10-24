@@ -4,16 +4,24 @@
   "title": "C# – czytanie kodu: podstawy",
   "subject": "csharp",
   "locale": "pl",
-  "version": 1,
+  "version": 2,
   "description": "Pułapki C#: typy wartościowe i referencyjne, stringi, LINQ, async.",
   "levels": [
     {
       "number": 1,
-      "title": "Wartości i stringi"
+      "title": "Wartości i referencje"
     },
     {
       "number": 2,
-      "title": "LINQ i async"
+      "title": "Stringi i równość"
+    },
+    {
+      "number": 3,
+      "title": "LINQ"
+    },
+    {
+      "number": 4,
+      "title": "async i await"
     }
   ],
   "cards": [
@@ -28,8 +36,8 @@
         "class"
       ],
       "prompt": "Co wypisze ten kod?",
-      "codeLanguage": "csharp",
       "code": "var p1 = new Point { X = 1 };\nvar p2 = p1;\np2.X = 5;\n\nvar b1 = new Box { X = 1 };\nvar b2 = b1;\nb2.X = 5;\n\nConsole.WriteLine($\"{p1.X} {b1.X}\");\n\nstruct Point { public int X; }\nclass Box { public int X; }",
+      "codeLanguage": "csharp",
       "answer": {
         "kind": "choice",
         "options": [
@@ -43,17 +51,117 @@
       "explanation": "Point to struct (typ wartościowy), więc p2 = p1 kopiuje całą wartość i zmiana p2 nie dotyka p1. Box to klasa (typ referencyjny): b1 i b2 wskazują na ten sam obiekt, więc zmianę zrobioną przez b2 widać też przez b1."
     },
     {
-      "id": "cs-str-001",
+      "id": "cs-val-002",
       "type": "predict_output",
       "level": 1,
+      "difficulty": 1,
+      "tags": [
+        "value-types",
+        "struct",
+        "parameters"
+      ],
+      "prompt": "Co wypisze ten kod?",
+      "code": "var p = new Point { X = 1 };\nMove(p);\nConsole.WriteLine(p.X);\n\nstatic void Move(Point q) => q.X = 10;\n\nstruct Point { public int X; }",
+      "codeLanguage": "csharp",
+      "answer": {
+        "kind": "choice",
+        "options": [
+          "10",
+          "1",
+          "0",
+          "Błąd kompilacji"
+        ],
+        "correct": 1
+      },
+      "explanation": "Struct przekazany do metody jest kopiowany. Move zmienia swoją kopię q, a oryginalne p dalej ma X = 1. Żeby zmienić oryginał, trzeba przekazać go przez ref albo zwrócić nową wartość."
+    },
+    {
+      "id": "cs-val-003",
+      "type": "predict_output",
+      "level": 1,
+      "difficulty": 2,
+      "tags": [
+        "reference-types",
+        "class",
+        "parameters"
+      ],
+      "prompt": "Co wypisze ten kod?",
+      "code": "var b = new Box { X = 1 };\nChange(b);\nConsole.WriteLine(b.X);\n\nstatic void Change(Box box)\n{\n    box.X = 2;\n    box = new Box { X = 3 };\n}\n\nclass Box { public int X; }",
+      "codeLanguage": "csharp",
+      "answer": {
+        "kind": "choice",
+        "options": [
+          "1",
+          "3",
+          "2",
+          "NullReferenceException"
+        ],
+        "correct": 2
+      },
+      "explanation": "Do metody trafia kopia referencji. box.X = 2 zmienia wspólny obiekt, więc b to widzi. Potem box = new Box(...) przestawia tylko lokalną kopię referencji na nowy obiekt; zmienna b dalej wskazuje na stary, z X = 2."
+    },
+    {
+      "id": "cs-val-004",
+      "type": "predict_output",
+      "level": 1,
+      "difficulty": 2,
+      "tags": [
+        "value-types",
+        "ref",
+        "parameters"
+      ],
+      "prompt": "Co wypisze ten kod?",
+      "code": "int a = 1;\nInc(a);\nIncRef(ref a);\nConsole.WriteLine(a);\n\nstatic void Inc(int x) => x++;\nstatic void IncRef(ref int x) => x++;",
+      "codeLanguage": "csharp",
+      "answer": {
+        "kind": "choice",
+        "options": [
+          "2",
+          "1",
+          "3",
+          "Błąd kompilacji"
+        ],
+        "correct": 0
+      },
+      "explanation": "Inc dostaje kopię int i zwiększa tylko ją. IncRef dostaje ref, czyli alias na zmienną a, więc zwiększa oryginał. Wynik: 1 + 1 = 2."
+    },
+    {
+      "id": "cs-val-005",
+      "type": "predict_output",
+      "level": 1,
+      "difficulty": 2,
+      "tags": [
+        "value-types",
+        "struct",
+        "collections"
+      ],
+      "prompt": "Co wypisze ten kod?",
+      "code": "var list = new List<Point> { new Point { X = 1 } };\nvar p = list[0];\np.X = 5;\nConsole.WriteLine(list[0].X);\n\nstruct Point { public int X; }",
+      "codeLanguage": "csharp",
+      "answer": {
+        "kind": "choice",
+        "options": [
+          "5",
+          "0",
+          "Błąd kompilacji",
+          "1"
+        ],
+        "correct": 3
+      },
+      "explanation": "Indekser listy zwraca kopię structa, więc p to osobna wartość i zmiana p.X nie trafia do listy. Bezpośrednie list[0].X = 5 w ogóle się nie skompiluje (CS1612) właśnie z tego powodu. Trzeba zmienić kopię i wpisać ją z powrotem: list[0] = p."
+    },
+    {
+      "id": "cs-str-001",
+      "type": "predict_output",
+      "level": 2,
       "difficulty": 1,
       "tags": [
         "string",
         "immutability"
       ],
       "prompt": "Co wypisze ten kod?",
-      "codeLanguage": "csharp",
       "code": "string s = \"kot\";\ns.ToUpper();\ns.Replace('k', 'p');\nConsole.WriteLine(s);",
+      "codeLanguage": "csharp",
       "answer": {
         "kind": "choice",
         "options": [
@@ -67,17 +175,115 @@
       "explanation": "Stringi w C# są niemutowalne. ToUpper() i Replace() zwracają nowe stringi, a tu ich wynik jest wyrzucany. Zmienna s nadal wskazuje na \"kot\". Poprawnie: s = s.ToUpper();"
     },
     {
-      "id": "cs-linq-001",
+      "id": "cs-str-002",
       "type": "predict_output",
       "level": 2,
+      "difficulty": 1,
+      "tags": [
+        "string",
+        "immutability",
+        "reference-types"
+      ],
+      "prompt": "Co wypisze ten kod?",
+      "code": "string a = \"ab\";\nstring b = a;\na += \"c\";\nConsole.WriteLine(b);",
+      "codeLanguage": "csharp",
+      "answer": {
+        "kind": "choice",
+        "options": [
+          "abc",
+          "ab",
+          "c",
+          "Błąd kompilacji"
+        ],
+        "correct": 1
+      },
+      "explanation": "string jest typem referencyjnym, ale niemutowalnym. a += \"c\" nie zmienia istniejącego obiektu, tylko tworzy nowy string \"abc\" i przestawia na niego a. b dalej wskazuje na stare \"ab\"."
+    },
+    {
+      "id": "cs-str-003",
+      "type": "predict_output",
+      "level": 2,
+      "difficulty": 2,
+      "tags": [
+        "string",
+        "equality"
+      ],
+      "prompt": "Co wypisze ten kod?",
+      "code": "string a = \"hello\";\nstring b = new string(\"hello\".ToCharArray());\nConsole.WriteLine($\"{a == b} {(object)a == (object)b}\");",
+      "codeLanguage": "csharp",
+      "answer": {
+        "kind": "choice",
+        "options": [
+          "True True",
+          "False False",
+          "True False",
+          "False True"
+        ],
+        "correct": 2
+      },
+      "explanation": "Dla typu string operator == jest przeciążony i porównuje treść, więc pierwsze to True. Po rzutowaniu na object używany jest == z object, czyli porównanie referencji. new string(...) tworzy osobny obiekt, więc drugie to False."
+    },
+    {
+      "id": "cs-str-004",
+      "type": "predict_output",
+      "level": 2,
+      "difficulty": 3,
+      "tags": [
+        "string",
+        "interning",
+        "equality"
+      ],
+      "prompt": "Co wypisze ten kod?",
+      "code": "string a = \"abc\";\nstring b = \"abc\";\nConsole.WriteLine(ReferenceEquals(a, b));",
+      "codeLanguage": "csharp",
+      "answer": {
+        "kind": "choice",
+        "options": [
+          "False",
+          "True",
+          "Zależy od trybu Debug/Release",
+          "Błąd kompilacji"
+        ],
+        "correct": 1
+      },
+      "explanation": "Literały stringów są internowane: ten sam literał w programie to jeden obiekt w pamięci. Dlatego a i b wskazują na ten sam obiekt i ReferenceEquals zwraca True. Stringi zbudowane w czasie działania (np. przez new string albo konkatenację zmiennych) już internowane nie są."
+    },
+    {
+      "id": "cs-str-005",
+      "type": "predict_output",
+      "level": 2,
+      "difficulty": 2,
+      "tags": [
+        "string",
+        "null"
+      ],
+      "prompt": "Co wypisze ten kod?",
+      "code": "string? s = null;\nConsole.WriteLine(s + \"x\");",
+      "codeLanguage": "csharp",
+      "answer": {
+        "kind": "choice",
+        "options": [
+          "NullReferenceException",
+          "nullx",
+          "x",
+          " x"
+        ],
+        "correct": 2
+      },
+      "explanation": "Konkatenacja stringów traktuje null jak pusty string, więc wynik to \"x\". Wyjątek poleciałby dopiero przy wywołaniu metody na null, np. s.Length albo s.ToUpper()."
+    },
+    {
+      "id": "cs-linq-001",
+      "type": "predict_output",
+      "level": 3,
       "difficulty": 2,
       "tags": [
         "linq",
         "deferred-execution"
       ],
       "prompt": "Co wypisze ten kod?",
-      "codeLanguage": "csharp",
       "code": "var list = new List<int> { 1, 2, 3 };\nvar query = list.Where(x => x > 1);\nlist.Add(4);\nConsole.WriteLine(query.Count());",
+      "codeLanguage": "csharp",
       "answer": {
         "kind": "choice",
         "options": [
@@ -91,17 +297,117 @@
       "explanation": "Where() nie liczy niczego od razu, tylko opisuje zapytanie (opóźnione wykonanie). Filtr wykonuje się dopiero przy Count(), czyli już po dodaniu 4. Elementy > 1 to 2, 3, 4, więc wynik to 3. Żeby zamrozić wynik, użyj ToList() przed list.Add(4)."
     },
     {
+      "id": "cs-linq-002",
+      "type": "predict_output",
+      "level": 3,
+      "difficulty": 3,
+      "tags": [
+        "linq",
+        "deferred-execution",
+        "multiple-enumeration"
+      ],
+      "prompt": "Co wypisze ten kod?",
+      "code": "int calls = 0;\nvar q = new List<int> { 1, 2, 3 }.Where(x =>\n{\n    calls++;\n    return x > 1;\n});\nvar count = q.Count();\nvar sum = q.Sum();\nConsole.WriteLine(calls);",
+      "codeLanguage": "csharp",
+      "answer": {
+        "kind": "choice",
+        "options": [
+          "3",
+          "0",
+          "6",
+          "2"
+        ],
+        "correct": 2
+      },
+      "explanation": "Zapytanie nie zapamiętuje wyników. Każde przejście po q (tu Count() i Sum()) wykonuje filtr od nowa dla wszystkich 3 elementów, więc lambda odpala się 2 × 3 = 6 razy. Przy kosztownym filtrze albo zapytaniu do bazy to realny problem; pomaga jedno ToList()."
+    },
+    {
+      "id": "cs-linq-003",
+      "type": "predict_output",
+      "level": 3,
+      "difficulty": 2,
+      "tags": [
+        "linq",
+        "deferred-execution",
+        "closures"
+      ],
+      "prompt": "Co wypisze ten kod?",
+      "code": "int limit = 1;\nvar nums = new List<int> { 1, 2, 3, 4 };\nvar q = nums.Where(x => x > limit);\nlimit = 3;\nConsole.WriteLine(string.Join(\",\", q));",
+      "codeLanguage": "csharp",
+      "answer": {
+        "kind": "choice",
+        "options": [
+          "2,3,4",
+          "4",
+          "3,4",
+          "(pusta linia)"
+        ],
+        "correct": 1
+      },
+      "explanation": "Lambda przechwytuje zmienną limit, a nie jej wartość z chwili tworzenia zapytania. Filtr wykonuje się dopiero w string.Join, gdy limit to już 3, więc zostaje tylko 4."
+    },
+    {
+      "id": "cs-linq-004",
+      "type": "predict_output",
+      "level": 3,
+      "difficulty": 1,
+      "tags": [
+        "linq",
+        "tolist",
+        "materialization"
+      ],
+      "prompt": "Co wypisze ten kod?",
+      "code": "var list = new List<int> { 1, 2, 3 };\nvar snap = list.Where(x => x > 1).ToList();\nlist.Add(4);\nConsole.WriteLine(snap.Count);",
+      "codeLanguage": "csharp",
+      "answer": {
+        "kind": "choice",
+        "options": [
+          "3",
+          "2",
+          "4",
+          "1"
+        ],
+        "correct": 1
+      },
+      "explanation": "ToList() od razu wykonuje zapytanie i kopiuje wynik do nowej listy. Późniejsze list.Add(4) nie ma na nią wpływu, więc snap ma 2 elementy (2 i 3)."
+    },
+    {
+      "id": "cs-linq-005",
+      "type": "predict_output",
+      "level": 3,
+      "difficulty": 2,
+      "tags": [
+        "linq",
+        "firstordefault",
+        "default"
+      ],
+      "prompt": "Co wypisze ten kod?",
+      "code": "var nums = new List<int> { 1, 3, 5 };\nConsole.WriteLine(nums.FirstOrDefault(x => x % 2 == 0));",
+      "codeLanguage": "csharp",
+      "answer": {
+        "kind": "choice",
+        "options": [
+          "(pusta linia), bo null",
+          "1",
+          "Wyjątek InvalidOperationException",
+          "0"
+        ],
+        "correct": 3
+      },
+      "explanation": "Nie ma liczby parzystej, więc FirstOrDefault zwraca default(int), czyli 0, a nie null. To pułapka: 0 może wyglądać jak prawdziwy wynik. Wyjątek rzuciłoby First()."
+    },
+    {
       "id": "cs-async-001",
       "type": "predict_output",
-      "level": 2,
+      "level": 4,
       "difficulty": 3,
       "tags": [
         "async",
         "await"
       ],
       "prompt": "Co wypisze ten kod?",
-      "codeLanguage": "csharp",
       "code": "var t = GetAsync();\nConsole.Write(\"B\");\nConsole.Write(await t);\n\nstatic async Task<int> GetAsync()\n{\n    Console.Write(\"A\");\n    return 1;\n}",
+      "codeLanguage": "csharp",
       "answer": {
         "kind": "choice",
         "options": [
@@ -113,6 +419,105 @@
         "correct": 1
       },
       "explanation": "Metoda async bez żadnego await wykonuje się w całości synchronicznie, w wątku wywołującym (kompilator ostrzega CS1998). Najpierw wypisuje A, zwraca już ukończony Task, potem leci B, a await t od razu daje 1. Słowo async samo z siebie nie przenosi pracy do tła."
+    },
+    {
+      "id": "cs-async-002",
+      "type": "predict_output",
+      "level": 4,
+      "difficulty": 2,
+      "tags": [
+        "async",
+        "await",
+        "fire-and-forget"
+      ],
+      "prompt": "Co wypisze ten kod?",
+      "code": "Console.Write(\"1\");\nDoAsync();\nConsole.Write(\"3\");\nawait Task.Delay(1000);\n\nstatic async Task DoAsync()\n{\n    await Task.Delay(10);\n    Console.Write(\"2\");\n}",
+      "codeLanguage": "csharp",
+      "answer": {
+        "kind": "choice",
+        "options": [
+          "123",
+          "132",
+          "13",
+          "312"
+        ],
+        "correct": 1
+      },
+      "explanation": "DoAsync() wywołane bez await działa do pierwszego niezakończonego await i oddaje sterowanie. Program od razu pisze 3, a 2 pojawia się dopiero po 10 ms. Brak await to błąd, który łatwo przeoczyć: wyjątki z takiego zadania też giną."
+    },
+    {
+      "id": "cs-async-003",
+      "type": "predict_output",
+      "level": 4,
+      "difficulty": 3,
+      "tags": [
+        "async",
+        "exceptions"
+      ],
+      "prompt": "Co wypisze ten kod?",
+      "code": "var t = FailAsync();\nConsole.Write(\"A\");\ntry\n{\n    await t;\n}\ncatch (InvalidOperationException)\n{\n    Console.Write(\"B\");\n}\n\nstatic async Task FailAsync()\n{\n    throw new InvalidOperationException();\n}",
+      "codeLanguage": "csharp",
+      "answer": {
+        "kind": "choice",
+        "options": [
+          "Nieobsłużony wyjątek przed A",
+          "B",
+          "A",
+          "AB"
+        ],
+        "correct": 3
+      },
+      "explanation": "Wyjątek rzucony w metodzie async nie wylatuje w chwili wywołania. Jest zapisywany w zwróconym Tasku i rzucany dopiero przy await. Dlatego najpierw jest A, a potem catch łapie wyjątek i pisze B."
+    },
+    {
+      "id": "cs-async-004",
+      "type": "predict_output",
+      "level": 4,
+      "difficulty": 3,
+      "tags": [
+        "async",
+        "async-void",
+        "lambda"
+      ],
+      "prompt": "Co wypisze ten kod?",
+      "code": "var list = new List<int> { 1, 2, 3 };\nint sum = 0;\nlist.ForEach(async x =>\n{\n    await Task.Delay(100);\n    sum += x;\n});\nConsole.WriteLine(sum);",
+      "codeLanguage": "csharp",
+      "answer": {
+        "kind": "choice",
+        "options": [
+          "6",
+          "0",
+          "Błąd kompilacji",
+          "1"
+        ],
+        "correct": 1
+      },
+      "explanation": "ForEach przyjmuje Action<int>, więc asynchroniczna lambda staje się async void. Nikt na nią nie czeka: każde wywołanie dochodzi do await Task.Delay i wraca. WriteLine wykonuje się od razu, gdy sum to wciąż 0. Zamiast tego użyj zwykłego foreach z await albo Task.WhenAll."
+    },
+    {
+      "id": "cs-async-005",
+      "type": "predict_output",
+      "level": 4,
+      "difficulty": 3,
+      "tags": [
+        "async",
+        "task",
+        "caching"
+      ],
+      "prompt": "Co wypisze ten kod?",
+      "code": "int counter = 0;\nTask<int> t = NextAsync();\nint a = await t;\nint b = await t;\nConsole.WriteLine($\"{a} {b} {counter}\");\n\nasync Task<int> NextAsync()\n{\n    await Task.Yield();\n    return ++counter;\n}",
+      "codeLanguage": "csharp",
+      "answer": {
+        "kind": "choice",
+        "options": [
+          "1 2 2",
+          "1 1 1",
+          "1 1 2",
+          "Wyjątek: Task można awaitować tylko raz"
+        ],
+        "correct": 1
+      },
+      "explanation": "Task reprezentuje jedno wykonanie. NextAsync() wywołano raz, więc counter zwiększył się raz. Drugi await na tym samym, już ukończonym Tasku tylko odczytuje zapamiętany wynik 1."
     }
   ]
 }

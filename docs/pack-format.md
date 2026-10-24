@@ -40,3 +40,9 @@ Schemat do walidacji: [`schema/pack.schema.json`](schema/pack.schema.json).
 - `line`: `{ "kind": "line", "line": 4, "fix": "…" }`. Na później, dla „znajdź błąd” (linia od 1).
 
 Nieznane pola są ignorowane, więc StudyOnMe może dodać własne (np. `source`) bez psucia gry.
+
+## Zasady pisania kart z kodem
+- Kod C# zakłada domyślny szablon konsolowy .NET 8: instrukcje najwyższego poziomu, `ImplicitUsings` i `Nullable` włączone. Typy (`struct`, `class`) deklarujemy pod instrukcjami.
+- Każdy fragment musi się kompilować i dawać jeden, deterministyczny wynik (poza kartami, gdzie poprawną odpowiedzią jest „Błąd kompilacji” albo wyjątek).
+- Kolejność opcji w pliku nie ma znaczenia: gra je tasuje.
+- Przed commitem: `python3 tools/validate_packs.py`.
