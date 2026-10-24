@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "id": "csharp-basics",
+  "title": "C# – czytanie kodu: podstawy",
+  "subject": "csharp",
+  "locale": "pl",
+  "version": 1,
+  "description": "Pułapki C#: typy wartościowe i referencyjne, stringi, LINQ, async.",
+  "levels": [
+    {
+      "number": 1,
+      "title": "Wartości i stringi"
+    },
+    {
+      "number": 2,
+      "title": "LINQ i async"
+    }
+  ],
+  "cards": [
+    {
+      "id": "cs-val-001",
+      "type": "predict_output",
+      "level": 1,
+      "difficulty": 1,
+      "tags": [
+        "value-types",
+        "struct",
+        "class"
+      ],
+      "prompt": "Co wypisze ten kod?",
+      "codeLanguage": "csharp",
+      "code": "var p1 = new Point { X = 1 };\nvar p2 = p1;\np2.X = 5;\n\nvar b1 = new Box { X = 1 };\nvar b2 = b1;\nb2.X = 5;\n\nConsole.WriteLine($\"{p1.X} {b1.X}\");\n\nstruct Point { public int X; }\nclass Box { public int X; }",
+      "answer": {
+        "kind": "choice",
+        "options": [
+          "1 1",
+          "1 5",
+          "5 1",
+          "5 5"
+        ],
+        "correct": 1
+      },
+      "explanation": "Point to struct (typ wartościowy), więc p2 = p1 kopiuje całą wartość i zmiana p2 nie dotyka p1. Box to klasa (typ referencyjny): b1 i b2 wskazują na ten sam obiekt, więc zmianę zrobioną przez b2 widać też przez b1."
+    },
+    {
+      "id": "cs-str-001",
+      "type": "predict_output",
+      "level": 1,
+      "difficulty": 1,
+      "tags": [
+        "string",
+        "immutability"
+      ],
+      "prompt": "Co wypisze ten kod?",
+      "codeLanguage": "csharp",
+      "code": "string s = \"kot\";\ns.ToUpper();\ns.Replace('k', 'p');\nConsole.WriteLine(s);",
+      "answer": {
+        "kind": "choice",
+        "options": [
+          "kot",
+          "KOT",
+          "pot",
+          "POT"
+        ],
+        "correct": 0
+      },
+      "explanation": "Stringi w C# są niemutowalne. ToUpper() i Replace() zwracają nowe stringi, a tu ich wynik jest wyrzucany. Zmienna s nadal wskazuje na \"kot\". Poprawnie: s = s.ToUpper();"
+    },
+    {
+      "id": "cs-linq-001",
+      "type": "predict_output",
+      "level": 2,
+      "difficulty": 2,
+      "tags": [
+        "linq",
+        "deferred-execution"
+      ],
+      "prompt": "Co wypisze ten kod?",
+      "codeLanguage": "csharp",
+      "code": "var list = new List<int> { 1, 2, 3 };\nvar query = list.Where(x => x > 1);\nlist.Add(4);\nConsole.WriteLine(query.Count());",
+      "answer": {
+        "kind": "choice",
+        "options": [
+          "2",
+          "3",
+          "4",
+          "Wyjątek InvalidOperationException"
+        ],
+        "correct": 1
+      },
+      "explanation": "Where() nie liczy niczego od razu, tylko opisuje zapytanie (opóźnione wykonanie). Filtr wykonuje się dopiero przy Count(), czyli już po dodaniu 4. Elementy > 1 to 2, 3, 4, więc wynik to 3. Żeby zamrozić wynik, użyj ToList() przed list.Add(4)."
+    },
+    {
+      "id": "cs-async-001",
+      "type": "predict_output",
+      "level": 2,
+      "difficulty": 3,
+      "tags": [
+        "async",
+        "await"
+      ],
+      "prompt": "Co wypisze ten kod?",
+      "codeLanguage": "csharp",
+      "code": "var t = GetAsync();\nConsole.Write(\"B\");\nConsole.Write(await t);\n\nstatic async Task<int> GetAsync()\n{\n    Console.Write(\"A\");\n    return 1;\n}",
+      "answer": {
+        "kind": "choice",
+        "options": [
+          "BA1",
+          "AB1",
+          "A1B",
+          "B1A"
+        ],
+        "correct": 1
+      },
+      "explanation": "Metoda async bez żadnego await wykonuje się w całości synchronicznie, w wątku wywołującym (kompilator ostrzega CS1998). Najpierw wypisuje A, zwraca już ukończony Task, potem leci B, a await t od razu daje 1. Słowo async samo z siebie nie przenosi pracy do tła."
+    }
+  ]
+}
