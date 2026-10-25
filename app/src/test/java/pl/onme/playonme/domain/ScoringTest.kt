@@ -30,6 +30,24 @@ class ScoringTest {
     }
 
     @Test
+    fun runCountsRepeatedCardAsMasteredAfterFirstHit() {
+        val score = Scoring.scoreRun(
+            listOf(CardAnswer("a", 2, true), CardAnswer("a", 2, true), CardAnswer("b", 1, false)),
+            alreadyMastered = emptySet(),
+            perfectBonus = false,
+        )
+        assertEquals(listOf(20, 10, 0), score.xpPerCard)
+        assertEquals(30, score.xp)
+    }
+
+    @Test
+    fun runPerfectBonusOnlyWhenAsked() {
+        val answers = listOf(CardAnswer("a", 1, true))
+        assertEquals(10, Scoring.scoreRun(answers, emptySet(), perfectBonus = false).xp)
+        assertEquals(10 + Scoring.PERFECT_ROUND_BONUS, Scoring.scoreRun(answers, emptySet(), perfectBonus = true).xp)
+    }
+
+    @Test
     fun emptyRoundIsNotPerfect() {
         assertEquals(0, Scoring.scoreRound(emptyList(), emptySet()).xp)
     }

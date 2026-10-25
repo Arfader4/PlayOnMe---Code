@@ -28,3 +28,16 @@ data class RoundResultEntity(
     val total: Int,
     val xp: Int,
 )
+
+/** Jedna gra w szybkim trybie. `mode` to [pl.onme.playonme.domain.QuickMode.key], `day` to epochDay rozpoczęcia. */
+@Entity(tableName = "mode_result", indices = [Index("mode", "subject")])
+data class ModeResultEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val mode: String,
+    val subject: String,
+    val day: Long,
+    val finishedAt: Long,
+    val correct: Int,
+    val total: Int,
+    val xp: Int,
+)

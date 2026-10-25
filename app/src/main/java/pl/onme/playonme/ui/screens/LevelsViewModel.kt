@@ -2,6 +2,7 @@ package pl.onme.playonme.ui.screens
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import java.time.LocalDate
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
@@ -16,6 +17,7 @@ import pl.onme.playonme.data.ProgressRepository
 import pl.onme.playonme.data.pack.Pack
 import pl.onme.playonme.data.pack.PackRepository
 import pl.onme.playonme.domain.LevelUnlocks
+import pl.onme.playonme.domain.QuickMode
 
 data class LevelItem(
     val packId: String,
@@ -32,11 +34,30 @@ data class PackSection(
     val levels: List<LevelItem>,
 )
 
+/** Rekordy i stan wyzwania dnia do kafelków szybkich trybów. */
+data class QuickModesInfo(
+    val bestBlitz: Int?,
+    val bestSurvival: Int?,
+    val dailyDone: Boolean,
+    val dailyStreak: Int,
+)
+
 class LevelsViewModel(
     subject: String,
     packs: PackRepository,
     private val progress: ProgressRepository,
+    today: Long = LocalDate.now().toEpochDay(),
 ) : ViewModel() {
+
+    /** null = jeszcze się ładuje. */
+    val quickModes: StateFlow<QuickModesInfo?> =
+        combine(
+            progress.bestCorrect(QuickMode.BLITZ, subject),
+            progress.bestCorrect(QuickMode.SURVIVAL, subject),
+            progress.dailyResult(subject, today),
+            progress.dailyStreak(today),
+        ) { blitz, survival, daily, streak -> QuickModesInfo(blitz, survival, daily != null, streak) }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     /** null = jeszcze się ładuje. */
     @OptIn(ExperimentalCoroutinesApi::class)
