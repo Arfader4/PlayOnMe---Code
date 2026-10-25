@@ -47,6 +47,34 @@ object Scoring {
             xpPerCard = perCard,
         )
     }
+
+    /**
+     * Wynik szybkiego trybu (Blitz, seria, wyzwanie dnia). Karta może wrócić w tej samej grze,
+     * więc po pierwszym zaliczeniu liczy się już jako zaliczona (połowa XP).
+     * Bonus za bezbłędność tylko tam, gdzie liczba kart jest stała (wyzwanie dnia).
+     */
+    fun scoreRun(answers: List<CardAnswer>, alreadyMastered: Set<String>, perfectBonus: Boolean): RoundScore {
+        val mastered = alreadyMastered.toMutableSet()
+        val perCard = answers.map { answer ->
+            val xp = when {
+                !answer.correct -> 0
+                answer.cardId in mastered -> XP_PER_DIFFICULTY * answer.difficulty / 2
+                else -> XP_PER_DIFFICULTY * answer.difficulty
+            }
+            if (answer.correct) mastered += answer.cardId
+            xp
+        }
+        val correct = answers.count { it.correct }
+        val perfect = answers.isNotEmpty() && correct == answers.size
+        val bonus = if (perfect && perfectBonus) PERFECT_ROUND_BONUS else 0
+        return RoundScore(
+            xp = perCard.sum() + bonus,
+            correct = correct,
+            total = answers.size,
+            perfect = perfect,
+            xpPerCard = perCard,
+        )
+    }
 }
 
 /** Poziom gracza wyliczany z łącznego XP. */

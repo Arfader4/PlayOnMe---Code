@@ -30,4 +30,13 @@ Format paczek zadań: [docs/pack-format.md](docs/pack-format.md) (wspólny ze St
 
 Bez `keystore.properties` build release też przejdzie, ale APK będzie niepodpisany.
 
-Później: „znajdź błąd”, T-SQL, serie, odznaki, bossowie, rundy na czas, synchronizacja ze StudyOnMe.
+## Szybkie tryby (po MVP)
+Na ekranie poziomów, w sekcji „Szybka gra”. Działają na istniejących kartach, bez zmian w paczkach.
+- **Wyzwanie dnia**: 5 kart wylosowanych z dnia i przedmiotu (ze wszystkich poziomów, więc u każdego te same), jedna próba dziennie, licznik dni z rzędu. Bezbłędnie: +20 XP.
+- **Blitz 60 s**: dobra odpowiedź +2 s, zła −5 s, gra sama przechodzi dalej. Rekord = najwięcej poprawnych.
+- **Seria**: od najłatwiejszych do najtrudniejszych, pierwszy błąd kończy grę.
+- Blitz i seria biorą karty tylko z odblokowanych poziomów. XP liczone jak w rundach (karta już zaliczona: połowa, także przy powtórce w tej samej grze).
+- Po grze lista „Co przegapiłeś” z poprawną odpowiedzią i wyjaśnieniem.
+- Kod: `domain/QuickModes.kt` (zasady, z testami), `ui/screens/QuickPlay*.kt`. Wyniki w tabeli `mode_result` (baza w wersji 2, migracja zachowuje dotychczasowy postęp).
+
+Później: „znajdź błąd”, T-SQL, odznaki, bossowie, uzupełnianie kodu, łączenie w pary, spadający kod, synchronizacja ze StudyOnMe.

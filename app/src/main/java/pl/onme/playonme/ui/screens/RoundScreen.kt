@@ -141,9 +141,9 @@ private fun QuestionBody(state: RoundState.Playing, onSelect: (Int) -> Unit, onN
     }
 }
 
-private enum class OptionStatus { NEUTRAL, CORRECT, WRONG, DIMMED }
+internal enum class OptionStatus { NEUTRAL, CORRECT, WRONG, DIMMED }
 
-private fun optionStatus(index: Int, selected: Int?, correctIndex: Int): OptionStatus = when {
+internal fun optionStatus(index: Int, selected: Int?, correctIndex: Int): OptionStatus = when {
     selected == null -> OptionStatus.NEUTRAL
     index == correctIndex -> OptionStatus.CORRECT
     index == selected -> OptionStatus.WRONG
@@ -151,7 +151,7 @@ private fun optionStatus(index: Int, selected: Int?, correctIndex: Int): OptionS
 }
 
 @Composable
-private fun OptionTile(text: String, status: OptionStatus, enabled: Boolean, onClick: () -> Unit) {
+internal fun OptionTile(text: String, status: OptionStatus, enabled: Boolean, onClick: () -> Unit) {
     val colors = MaterialTheme.colorScheme
     val borderColor by animateColorAsState(
         when (status) {
@@ -204,7 +204,7 @@ private fun SummaryContent(outcome: RoundOutcome, onRepeat: () -> Unit, onDone: 
 }
 
 @Composable
-private fun Highlight(text: String, color: Color) {
+internal fun Highlight(text: String, color: Color) {
     Surface(
         color = color.copy(alpha = 0.15f),
         shape = RoundedCornerShape(12.dp),
