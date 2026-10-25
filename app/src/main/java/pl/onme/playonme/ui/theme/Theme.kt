@@ -24,6 +24,16 @@ private val OnMeDark = darkColorScheme(
     onSurfaceVariant = Color(0xFFB0B4BE),
 )
 
+/** Kolory składni w blokach kodu (paleta w stylu Tokyo Night, pasuje do ciemnego motywu). */
+object SyntaxColors {
+    val keyword = Color(0xFFBB9AF7)
+    val type = Color(0xFF2AC3DE)
+    val function = Color(0xFF7AA2F7)
+    val string = Color(0xFF9ECE6A)
+    val number = Color(0xFFFF9E64)
+    val comment = Color(0xFF636B8F)
+}
+
 /** Styl dla bloków kodu w rundzie. */
 val CodeTextStyle = TextStyle(fontFamily = FontFamily.Monospace, fontSize = 14.sp, lineHeight = 20.sp)
 
