@@ -8,3 +8,9 @@
 /captures/
 .externalNativeBuild/
 .cxx/
+
+# Podpis release
+keystore.properties
+*.jks
+*.keystore
+/app/release/

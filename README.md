@@ -21,6 +21,13 @@ Format paczek zadań: [docs/pack-format.md](docs/pack-format.md) (wspólny ze St
 - Poziom paczki odblokowuje się, gdy w poprzednim zaliczysz co najmniej 60% kart.
 - Kod: `domain/Scoring.kt` (czyste funkcje z testami), zapis w `data/ProgressRepository.kt`.
 4. **Ekrany** ✅ wybór języka → lista poziomów (z postępem) → runda z kodem i opcjami + wyjaśnienie → podsumowanie XP.
-5. **Szlif:** kolorowanie składni, animacje odpowiedzi, ikona, build APK.
+5. **Szlif** ✅ kolorowanie składni, animacje, ikona, podpisany APK.
+
+## Podpisany APK
+1. Utwórz klucz (raz): `keytool -genkeypair -v -keystore C:/Users/<ty>/keys/playonme.jks -alias playonme -keyalg RSA -keysize 2048 -validity 9125`. Trzymaj `.jks` i hasła poza repo, z kopią zapasową.
+2. Skopiuj `keystore.properties.example` do `keystore.properties` i wpisz ścieżkę oraz hasła.
+3. `./gradlew assembleRelease` → `app/build/outputs/apk/release/app-release.apk`.
+
+Bez `keystore.properties` build release też przejdzie, ale APK będzie niepodpisany.
 
 Później: „znajdź błąd”, T-SQL, serie, odznaki, bossowie, rundy na czas, synchronizacja ze StudyOnMe.

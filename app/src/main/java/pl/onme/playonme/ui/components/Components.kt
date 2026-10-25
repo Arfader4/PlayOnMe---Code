@@ -1,5 +1,7 @@
 package pl.onme.playonme.ui.components
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,12 +20,21 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import pl.onme.playonme.domain.PlayerLevel
+import pl.onme.playonme.ui.code.TokenKind
+import pl.onme.playonme.ui.code.Tokenizer
 import pl.onme.playonme.ui.theme.CodeTextStyle
+import pl.onme.playonme.ui.theme.SyntaxColors
 
 /** Nagłówek ekranu z opcjonalnym przyciskiem powrotu. */
 @Composable
@@ -40,6 +51,7 @@ fun ScreenHeader(title: String, onBack: (() -> Unit)? = null) {
 /** Poziom gracza i pasek XP do następnego poziomu. */
 @Composable
 fun PlayerLevelBar(level: PlayerLevel, modifier: Modifier = Modifier) {
+    val progress by animateFloatAsState(level.progress, animationSpec = tween(durationMillis = 900), label = "levelProgress")
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
             Text("Poziom ${level.level}", style = MaterialTheme.typography.titleMedium)
@@ -50,16 +62,17 @@ fun PlayerLevelBar(level: PlayerLevel, modifier: Modifier = Modifier) {
             )
         }
         LinearProgressIndicator(
-            progress = { level.progress },
+            progress = { progress },
             modifier = Modifier.fillMaxWidth(),
             trackColor = MaterialTheme.colorScheme.surfaceVariant,
         )
     }
 }
 
-/** Blok kodu z numerami linii; długie linie przewijają się w poziomie zamiast zawijać. */
+/** Blok kodu z numerami linii i kolorowaniem; długie linie przewijają się w poziomie zamiast zawijać. */
 @Composable
-fun CodeBlock(code: String, modifier: Modifier = Modifier) {
+fun CodeBlock(code: String, language: String?, modifier: Modifier = Modifier) {
+    val highlighted = remember(code, language) { highlight(code, language) }
     val lines = code.lines()
     val numberWidth = lines.size.toString().length
     Surface(
@@ -75,12 +88,27 @@ fun CodeBlock(code: String, modifier: Modifier = Modifier) {
             )
             Spacer(Modifier.width(12.dp))
             Text(
-                text = code,
+                text = highlighted,
                 style = CodeTextStyle,
                 softWrap = false,
                 modifier = Modifier.horizontalScroll(rememberScrollState()),
             )
         }
+    }
+}
+
+private fun highlight(code: String, language: String?): AnnotatedString = buildAnnotatedString {
+    for (token in Tokenizer.tokenize(code, language)) {
+        val color = when (token.kind) {
+            TokenKind.KEYWORD -> SyntaxColors.keyword
+            TokenKind.TYPE -> SyntaxColors.type
+            TokenKind.FUNCTION -> SyntaxColors.function
+            TokenKind.STRING -> SyntaxColors.string
+            TokenKind.NUMBER -> SyntaxColors.number
+            TokenKind.COMMENT -> SyntaxColors.comment
+            TokenKind.PLAIN -> null
+        }
+        if (color == null) append(token.text) else withStyle(SpanStyle(color = color)) { append(token.text) }
     }
 }
 
